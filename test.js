@@ -23,13 +23,27 @@ describe("pow", function () {
         }
     });
 
-    it("for negative n the result is NaN", function() {
+    it("for negative n the result is NaN", function () {
         assert.isNaN(pow(2, -1));
     });
 
-    it("for non-integer n the result is NaN", function() {
+    it("for non-integer n the result is NaN", function () {
         assert.isNaN(pow(2, 1.5));
     });
 
     // ... more tests to follow here, both describe and it can be added
 });
+
+/*
+describe("determines n (n > 0) is a prime", function() {
+    function makeTest(n) {
+        it(`${n} is a prime number`, function () {
+            assert.isTrue(isPrime(n));
+        });
+    }
+
+    makeTest(11);
+    makeTest(13);
+    makeTest(17);
+});
+*/

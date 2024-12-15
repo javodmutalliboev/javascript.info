@@ -18,20 +18,24 @@
     </script>
 </head>
 <body>
-<script>
-    function pow(x, n) {
-        /* function code is to be written, empty now */
-        if (n < 0) return NaN;
-        if (Math.round(n) != n) return NaN;
+<script> <!--src="script.js"-->
+function pow(x, n) {
+    /* function code is to be written, empty now */
+    if (n < 0) return NaN;
+    if (Math.round(n) != n) return NaN;
 
-        let result = 1;
+    let result = 1;
 
-        for (let i = 0; i < n; i++) {
-            result *= x;
-        }
-
-        return result;
+    for (let i = 0; i < n; i++) {
+        result *= x;
     }
+
+    return result;
+}
+</script>
+
+<script type="text/javascript">
+    <!--    -->
 </script>
 
 <!-- the script with tests (describe, it...) -->

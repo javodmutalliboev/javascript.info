@@ -1,39 +1,65 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <title>Practice</title>
     <style>
         :root {
-            background-color: #122334;
-            color-scheme: dark;
+            background-color: #233445;
+            color: #9AABBC;
         }
-
-        .circle {
-            transition-property: width, height;
-            transition-duration: 2s;
-            position: fixed;
-            transform: translateX(-50%) translateY(-50%);
-            background-color: red;
-            border-radius: 50%;
-
-            width: 200px;
-            height: 200px;
-            top: 150px;
-            left: 150px;
-        }
-
-        .message-ball {
-            font-size: 20px;
-            line-height: 200px;
-            text-align: center;
-        }
-
     </style>
 </head>
 <body>
-<label for="input">Input</label>
-<input type="text" id="input"/>
-<div id="output"></div>
-<script src="call%20async%20from%20non-async.js"></script>
+
+<ul>
+    <li>Animals
+        <ul>
+            <li>Mammals
+                <ul>
+                    <li>Cows</li>
+                    <li>Donkeys</li>
+                    <li>Dogs</li>
+                    <li>Tigers</li>
+                </ul>
+            </li>
+            <li>Other
+                <ul>
+                    <li>Snakes</li>
+                    <li>Birds</li>
+                    <li>Lizards</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li>Fishes
+        <ul>
+            <li>Aquarium
+                <ul>
+                    <li>Guppy</li>
+                    <li>Angelfish</li>
+                </ul>
+            </li>
+            <li>Sea
+                <ul>
+                    <li>Sea trout</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<script>
+    // ... your code...
+
+    for (let li of document.querySelectorAll("li")) {
+        let title = li.firstChild.data;
+
+        let descendentsNumber = li.getElementsByTagName("li").length;
+
+        console.log(`${title}: ${descendentsNumber}`.replace(/\s{2,}/, ""));
+
+        alert(`${title}: ${descendentsNumber}`.replace(/\s{2,}/, ""));
+    }
+</script>
+
 </body>
 </html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title></title>
+    <style>
+        :root {
+            background-color: #233445;
+            color: #abbccd;
+            font-size: 44px;
+        }
+    </style>
+</head>
+<body>
+<div data-widget-name="menu">Choose the genre</div>
+
+<script>
+    const elem = document.querySelector("[data-widget-name]");
+
+    alert(elem.dataset.widgetName);
+
+    alert(elem.getAttribute("data-widget-name"));
+</script>
+</body>
+</html>

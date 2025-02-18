@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Colored Clock with setInterval</title>
+
+    <style>
+        #hh {
+            color: red;
+        }
+
+        #mm {
+            color: green;
+        }
+
+        #ss {
+            color: blue;
+        }
+
+        #colored-clock {
+            font-weight: bold;
+            font-size: 64px;
+        }
+
+        button {
+            font-size: 64px;
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+<div id="colored-clock">
+</div>
+
+<script>
+    const coloredClock = document.getElementById("colored-clock");
+
+    const hh = createSpan("hh");
+    coloredClock.appendChild(hh);
+    coloredClock.append(":");
+    const mm = createSpan("mm");
+    coloredClock.appendChild(mm);
+    coloredClock.append(":");
+    const ss = createSpan("ss");
+    coloredClock.appendChild(ss);
+
+    const startButton = createButton("start", startClickListener);
+    const stopButton = createButton("stop", stopClickListener);
+
+    coloredClock.appendChild(
+        document.createElement("div")
+    );
+
+    coloredClock.lastElementChild.append(
+        startButton, document.createTextNode(" "), stopButton
+    );
+
+    function createSpan(part) {
+        const span = document.createElement("span");
+        span.id = part;
+        span.textContent = part;
+        return span;
+    }
+
+    function createButton(name, listener) {
+        const button = document.createElement("button");
+        button.textContent = name;
+        button.addEventListener("click", listener);
+        return button;
+    }
+
+    let intervalId;
+    let now;
+
+    function startClickListener() {
+        intervalId = setInterval(() => {
+            now = new Date();
+            hh.textContent = now.getHours() < 10 ? "0" + now.getHours() : now.getHours().toString();
+            mm.textContent = now.getMinutes() < 10 ? "0" + now.getMinutes() : now.getMinutes().toString();
+            ss.textContent = now.getSeconds() < 10 ? "0" + now.getSeconds() : now.getSeconds().toString();
+        }, 1000);
+    }
+
+    function stopClickListener() {
+        clearInterval(intervalId);
+    }
+</script>
+</body>
+</html>

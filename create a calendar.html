@@ -16,8 +16,13 @@
             text-align: center;
         }
 
-        .dates {
+        th {
+            font-weight: bold;
+            background-color: #abbccd;
+        }
 
+        td {
+            background-color: #fefefe;
         }
     </style>
 </head>
@@ -30,7 +35,7 @@
      * @param { number } year
      * @param { number } month
      */
-    function createCalendar(elem, year, month) {
+    async function createCalendar(elem, year, month) {
         const table = document.createElement("table");
         const tHead = document.createElement("thead");
         table.appendChild(tHead);
@@ -60,12 +65,20 @@
                     const td = document.createElement("td");
                     tr.appendChild(td);
                 }
-            } else if (dt.getDay() === 0) {
+            } else if (dt.getDay() === 1) {
                 const tr = document.createElement("tr");
                 tBody.appendChild(tr);
             }
             const td = document.createElement("td");
             td.textContent = dt.getDate().toString();
+            tBody.lastElementChild.appendChild(td);
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        const tdCountToInsert = 7 - tBody.lastElementChild.querySelectorAll("td").length;
+
+        for (let i = 0; i < tdCountToInsert; i++) {
+            const td = document.createElement("td");
             tBody.lastElementChild.appendChild(td);
         }
     }

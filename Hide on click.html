@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hide on click</title>
+</head>
+<body>
+<input type="button" id="hider" value="Click to hide the text"/>
+
+<div id="text">Text</div>
+
+<input type="button" id="self-hider" value="Hide self" onclick="this.hidden = true; console.log('me');"/>
+
+<script>
+    /* your code */
+
+    const hider = document.getElementById("hider");
+
+    hider.onclick = (e) => {
+        const text = document.getElementById("text");
+
+        text.hidden = true;
+    };
+</script>
+</body>
+</html>

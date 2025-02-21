@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart tooltip</title>
+
+    <style>
+
+        .hours {
+            color: red;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .minutes {
+            color: green;
+        }
+
+        .seconds {
+            color: blue;
+        }
+
+        .clock {
+            border: 1px dashed black;
+            padding: 5px;
+            display: inline-block;
+            background: yellow;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        #tooltip {
+            position: absolute;
+            padding: 10px 20px;
+            border: 1px solid #b3c9ce;
+            border-radius: 4px;
+            text-align: center;
+            font: italic 14px/1.3 sans-serif;
+            color: #333;
+            background: #fff;
+            z-index: 100000;
+            box-shadow: 3px 3px 3px rgba(0, 0, 0, .3);
+        }
+
+    </style>
+
+    <script>
+
+        "use strict";
+
+        class HoverIntent {
+
+            constructor({
+                            sensitivity = 0.1, // speed less than 0.1px/ms means "hovering over an element"
+                            interval = 100, // measure mouse speed once per 100ms
+                            elem, over, out
+                        }) {
+                this.sensitivity = sensitivity;
+                this.interval = interval;
+                this.elem = elem;
+                this.over = over;
+                this.out = out;
+
+                // make sure "this" is the object in event handlers
+                this.onMouseMove = this.onMouseMove.bind(this);
+                this.onMouseOver = this.onMouseOver.bind(this);
+                this.onMouseOut = this.onMouseOut.bind(this);
+
+                // and in time-measuring function (called from setInterval)
+                this.trackSpeed = this.trackSpeed.bind(this);
+
+                elem.addEventListener("mouseover", this.onMouseOver);
+
+                elem.addEventListener("mouseout", this.onMouseOut);
+            }
+
+            onMouseOver(event) {
+                if (this.isOverElement) {
+                    // if we're over the element, then ignore the event
+                    // we are already measuring the speed
+                    return;
+                }
+
+                this.isOverElement = true;
+
+                // after every mousemove we'll be checking the distance
+                // between the previous and the current mouse coordinates
+                // if it's less than sensitivity, then the speed is slow
+
+                this.prevX = event.pageX;
+                this.prevY = event.pageY;
+                this.prevTime = Date.now();
+
+                elem.addEventListener("mousemove", this.onMouseMove);
+                this.checkSpeedInterval = setInterval(this.trackSpeed, this.interval);
+            }
+
+            onMouseOut(event) {
+                // if left the element
+                if (!event.relatedTarget || !elem.contains(event.relatedTarget)) {
+                    this.isOverElement = false;
+                    this.elem.removeEventListener("mousemove", this.onMouseMove);
+                    clearInterval(this.checkSpeedInterval);
+                    if (this.isHover) {
+                        // if there was a stop over the element
+                        this.out.call(this.elem, event);
+                        this.isHover = false;
+                    }
+                }
+            }
+
+            onMouseMove(event) {
+                this.lastX = event.pageX;
+                this.lastY = event.pageY;
+                this.lastTime = Date.now();
+            }
+
+            trackSpeed() {
+                let speed;
+
+                if (!this.lastTime || this.lastTime === this.prevTime) {
+                    // cursor didn't move
+                    speed = 0;
+                } else {
+                    speed = Math.sqrt(
+                        Math.pow(this.prevX - this.lastX, 2) +
+                        Math.pow(this.prevY - this.lastY, 2)
+                    ) / (this.lastTime - this.prevTime);
+                }
+
+                if (speed < this.sensitivity) {
+                    clearInterval(this.checkSpeedInterval);
+                    this.isHover = true;
+                    this.over.call(this.elem);
+                } else {
+                    // speed fast, remember new coordinates as the previous ones
+                    this.prevX = this.lastX;
+                    this.prevY = this.lastY;
+                    this.prevTime = this.lastTime;
+                }
+            }
+
+            destroy() {
+                elem.removeEventListener("mousemove", this.onMouseMove);
+                elem.removeEventListener("mouseover", this.onMouseOver);
+                elem.removeEventListener("mouseout", this.onMouseOut);
+            }
+        }
+
+    </script>
+
+    <script src="https://en.js.cx/test/libs.js"></script>
+
+    <script>
+
+        "use strict";
+
+        describe("hoverIntent", function () {
+
+            function mouse(eventType, x, y, options) {
+                let eventOptions = Object.assign({
+                    bubbles: true,
+                    clientX: x,
+                    clientY: y,
+                    pageX: x,
+                    pageY: y,
+                    target: elem,
+                }, options || {});
+
+                elem.dispatchEvent(new MouseEvent(eventType, eventOptions));
+            }
+
+            let isOver;
+            let hoverIntent;
+
+            before(function () {
+                this.clock = sinon.useFakeTimers();
+            });
+
+            after(function () {
+                this.clock.restore();
+            });
+
+            beforeEach(function () {
+                isOver = false;
+
+                hoverIntent = new HoverIntent({
+                    elem: elem,
+                    over: function () {
+                        isOver = true;
+                    },
+                    out: function () {
+                        isOver = false;
+                    }
+                });
+            });
+
+            afterEach(function () {
+                if (hoverIntent) {
+                    hoverIntent.destroy();
+                }
+            });
+
+            it("mouseover -> when the pointer just arrived, no tooltip",
+                function () {
+                    mouse("mouseover", 10, 10);
+                    assert.isFalse(isOver);
+                });
+
+            it("mouseover -> after a delay, the tooltip shows up", function () {
+                mouse("mouseover", 10, 10);
+                this.clock.tick(100);
+                assert.isTrue(isOver);
+            });
+
+            it("mouseover -> followed by fast mouseout leads doesn't show tooltip", function () {
+                mouse("mouseover", 10, 10);
+                setTimeout(
+                    () => mouse("mouseout", 300, 300, { relatedTarget: document.body }),
+                );
+                this.clock.tick(100);
+                assert.isFalse(isOver);
+            });
+
+            it("mouseover -> slow move -> tooltips", function () {
+                mouse("mouseover", 10, 10);
+                for (let i = 10; i < 200; i += 10) {
+                    setTimeout(
+                        () => mouse("mousemove", i / 5, 10),
+                        i
+                    );
+                }
+                ;
+                this.clock.tick(200);
+                assert.isTrue(isOver);
+            });
+
+            it("mouseover -> fast move -> no tooltip", function () {
+                mouse("mouseover", 10, 10);
+                for (let i = 10; i < 200; i += 10) {
+                    setTimeout(
+                        () => mouse("mousemove", i, 10),
+                        i
+                    );
+                }
+                this.clock.tick(200);
+                assert.isFalse(isOver);
+            });
+        });
+
+    </script>
+
+</head>
+<body>
+
+<div id="elem" class="clock">
+    <span class="hours">12</span>
+    <span class="minutes">30</span>
+    <span class="seconds">00</span>
+</div>
+
+<div id="tooltip" hidden>Tooltip</div>
+
+<script>
+
+    new HoverIntent({
+        elem,
+        over() {
+            tooltip.style.left = elem.getBoundingClientRect() + 5 + "px";
+            tooltip.style.top = elem.getBoundingClientRect() + 5 + "px";
+            tooltip.hidden = false;
+        },
+        out() {
+            tooltip.hidden = true;
+        }
+    });
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

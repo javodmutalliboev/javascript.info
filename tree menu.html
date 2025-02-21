@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tree menu</title>
+
+    <style>
+
+        li {
+            cursor: pointer;
+        }
+
+        .visible {
+            display: block;
+        }
+
+        .invisible {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+<ul class="tree" id="tree">
+    <li>Animals
+        <ul>
+            <li>Mammals
+                <ul>
+                    <li>Cows</li>
+                    <li>Donkeys</li>
+                    <li>Dogs</li>
+                    <li>Tigers</li>
+                </ul>
+            </li>
+            <li>Other
+                <ul>
+                    <li>Snakes</li>
+                    <li>Birds</li>
+                    <li>Lizards</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li>Fishes
+        <ul>
+            <li>Aquarium
+                <ul>
+                    <li>Guppy</li>
+                    <li>Angelfish</li>
+                </ul>
+            </li>
+            <li>Sea
+                <ul>
+                    <li>Sea trout</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<script>
+
+    const tree = document.getElementById("tree");
+
+    tree.addEventListener("mouseover", function (event) {
+        if (event.target.tagName === "LI") {
+            let text = event.target.nextSibling;
+            event.target.style.fontWeight = "bold";
+            const childLis = event.target.querySelectorAll("li");
+            childLis.forEach(li => {
+                li.style.fontWeight = "normal";
+            });
+        }
+    });
+
+    tree.addEventListener("mouseout", function (event) {
+        if (event.target.tagName === "LI") {
+            let text = event.target.nextSibling;
+            event.target.style.fontWeight = "unset";
+        }
+    });
+
+    tree.addEventListener('click', function(event) {
+        if (event.target.tagName === "LI") {
+            const ul = event.target.querySelector('ul');
+            if (ul) {
+                ul.className = ul.className.includes('invisible') ? 'visible' : 'invisible';
+            }
+        }
+    });
+
+
+</script>
+
+</body>
+</html>
